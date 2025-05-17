@@ -1,3 +1,3 @@
-module IndiviService-bot
+module telegram-sdk
 
 go 1.24.1
