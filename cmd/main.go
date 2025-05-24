@@ -21,24 +21,17 @@ func LoggingMiddleware(next core.Handler) core.Handler {
 
 func main() {
 	token := os.Getenv("TELEGRAM_TOKEN")
-	r := router.New()
 
+	r := router.New()
 	r.Use(LoggingMiddleware)
 
-	r.Command("/start", func(ctx core.Context) {
-		err := ctx.Send(&commands.SendMessageRequest{Text: "AlexMayka"})
-		if err != nil {
-			fmt.Println(err)
-		}
+	admin := r.Group("/admin")
+
+	user := admin.Group("/user")
+	user.Command("/start", func(ctx core.Context) {
+		ctx.Send(&commands.SendMessageRequest{Text: "Alex"})
 	})
 
-	r.OnMsg(func(ctx core.Context) {
-		err := ctx.Send(&commands.SendMessageRequest{Text: ctx.Text()})
-		if err != nil {
-			fmt.Println(err)
-		}
-	})
-
-	b := bot.New(token, bot.WithRouter(r))
+	b := bot.New(token, bot.WithRouter(admin))
 	b.Run(context.Background())
 }

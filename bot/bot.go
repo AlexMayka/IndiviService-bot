@@ -56,11 +56,5 @@ func (b *Bot) Run(ctx context.Context) error {
 }
 
 func (b *Bot) dispatch(ctx context.Context, u updates.Update) {
-	h, ok := b.router.Match(u.Message.Text)
-	if !ok {
-		return
-	}
 
-	c := CtxBot{Context: ctx, m: u.Message, api: b.api}
-	h(&c)
 }

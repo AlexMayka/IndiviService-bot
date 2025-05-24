@@ -61,7 +61,7 @@ func (c *Client) SendMsg(ctx context.Context, msg *commands.SendMessageRequest) 
 	var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 	u := utils.Endpoint(&c.baseUrl, values.SendMessage)
-	body, err := json.Marshal(msg) // заменил Marshal
+	body, err := json.Marshal(msg)
 	if err != nil {
 		return err
 	}
