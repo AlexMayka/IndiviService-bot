@@ -1,0 +1,55 @@
+# Go build artifacts
+/bin/
+/build/
+/dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Go workspace
+*.mod~
+*.sum~
+go.sum
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.*
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Dependency directories (if any vendoring)
+vendor/
+
+# Coverage and testing
+coverage.*
+*.coverprofile
+*.testresult
+*.prof
+*.report
+
+# Docker artifacts
+docker-compose.override.yml
+*.pid
+*.sock
+
+# Git
+.git/
+
+# Optional: compiled protobufs or generated code
+*.pb.go
