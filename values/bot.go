@@ -16,9 +16,17 @@ const (
 
 // Endpoints defines supported Telegram Bot API methods.
 const (
-	GetMe       = "getMe"
-	GetUpdates  = "getUpdates"
-	SendMessage = "sendMessage"
+	GetMe               = "getMe"
+	GetUpdates          = "getUpdates"
+	SendMessage         = "sendMessage"
+	EditMessageText     = "editMessageText"
+	DeleteMessage       = "deleteMessage"
+	SendPhoto           = "sendPhoto"
+	SendDocument        = "sendDocument"
+	SendChatAction      = "sendChatAction"
+	AnswerCallbackQuery = "answerCallbackQuery"
+	GetChat             = "getChat"
+	SetMyCommands       = "setMyCommands"
 )
 
 // Settings defines shared configuration options.

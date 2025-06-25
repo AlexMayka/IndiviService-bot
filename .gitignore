@@ -1,55 +1,106 @@
-# Go build artifacts
-/bin/
-/build/
-/dist/
+# Binaries for programs and plugins
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
+
+# Test binary, built with `go test -c`
 *.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-# Go workspace
-*.mod~
-*.sum~
-go.sum
+# Dependency directories
+vendor/
 
-# IDEs and editors
+# Go workspace files
+go.work
+go.work.sum
+
+# IDE and editor files
 .vscode/
 .idea/
 *.swp
 *.swo
-*.bak
+*.tmp
+*~
+.atom/
+.sublime-project
+.sublime-workspace
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.*.local
 
 # Logs
 *.log
+log/
+logs/
 
-# Environment files
-.env
-.env.*
+# Build output
+dist/
+build/
+bin/
+out/
 
-# OS-specific files
-.DS_Store
-Thumbs.db
+config.yaml
+config.json
+config.toml
 
-# Dependency directories (if any vendoring)
-vendor/
+tmp/
+temp/
 
-# Coverage and testing
-coverage.*
+coverage.out
+coverage.html
 *.coverprofile
-*.testresult
-*.prof
-*.report
+*.cover
+c.out
 
-# Docker artifacts
+*.bench
+
+.air.toml
+
+*.db
+*.sqlite
+*.sqlite3
+
+docs/_build/
+site/
+
+*.pem
+*.key
+*.crt
+*.csr
+*.p12
+
+bot_token.txt
+secrets.txt
+*.token
+
 docker-compose.override.yml
-*.pid
-*.sock
+docker-compose.local.yml
 
-# Git
-.git/
+package-lock.json
+yarn.lock
 
-# Optional: compiled protobufs or generated code
 *.pb.go
+*_gen.go
+
+*.backup
+*.bak
+
+.air.conf

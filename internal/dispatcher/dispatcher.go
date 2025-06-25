@@ -38,14 +38,19 @@ func (b *Dispatcher) Dispatch(ctx core.Context) {
 
 	text := ctx.Text()
 
+	// Handle commands for regular messages
 	if handler, ok := entry.Cmd[text]; ok {
 		handler(ctx)
 		return
 	}
 
-	if handler, ok := entry.Callback[text]; ok {
-		handler(ctx)
-		return
+	// Handle callback queries
+	if ctx.IsCallback() {
+		callbackData := ctx.CallbackData()
+		if handler, ok := entry.Callback[callbackData]; ok {
+			handler(ctx)
+			return
+		}
 	}
 
 	for _, r := range entry.Regex {
