@@ -1,55 +1,35 @@
-<div align="center">
-
 # 🤖 Gogram
 
-**Modern Telegram Bot SDK for Go**
+**Simple Telegram Bot SDK for Go**
 
 [![Go Version](https://img.shields.io/badge/Go-1.24+-00ADD8?style=for-the-badge&logo=go)](https://golang.org)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-27%20Passing-brightgreen?style=for-the-badge)](https://github.com/AlexMayka/gogram/actions)
-[![Coverage](https://img.shields.io/badge/Coverage-95%25-brightgreen?style=for-the-badge)](https://github.com/AlexMayka/gogram)
 
-*Clean Architecture • Type Safety • Production Ready*
-
-[**Quick Start**](#-quick-start) • [**Documentation**](#-documentation) • [**Examples**](#-examples) • [**Contributing**](CONTRIBUTING.md)
-
-</div>
+*Clean Code • Type Safety • Easy to Use*
 
 ---
 
-## 🎯 Why Gogram?
+## 🎯 What is Gogram?
 
-Gogram is a modern, production-ready Telegram Bot SDK built with **Clean Architecture** principles. Unlike other libraries, Gogram provides:
+Gogram is a simple Telegram Bot SDK for Go that provides basic routing, state management, and message handling. It's designed to be easy to use for creating simple to moderately complex Telegram bots.
 
-- 🏗️ **Clean Architecture** - Domain-driven design with clear separation of concerns
-- 🔒 **Type Safety** - Fully typed API with compile-time guarantees  
-- 🧠 **Smart FSM** - Built-in finite state machine for complex conversational flows
-- 🔌 **Middleware Chain** - Composable middleware like Express.js or Gin
-- ⚡ **High Performance** - Zero-allocation routing with context pooling
-- 🧪 **Battle Tested** - Comprehensive test suite with 95%+ coverage
+## ✨ Features
 
-## 🚀 Features
-
-### 🏗️ Architecture & Design
-- **Clean Architecture** with dependency injection
-- **Interface-first design** for maximum testability  
-- **Middleware pipeline** for cross-cutting concerns
-- **Hierarchical routing** with grouping and nesting
-- **Context-based request handling** with proper cancellation
+### 🔧 Core Functionality
+- **Message Routing** - Commands, callbacks, regex patterns, and text matching
+- **State Management** - Basic finite state machine for conversation flows
+- **Middleware Chain** - Composable request processing
+- **Context Handling** - Request-scoped data and operations
+- **Inline Keyboards** - Simple keyboard builder for interactive messages
 
 ### 🤖 Telegram API Support
-- **Complete Bot API** - All major endpoints implemented
-- **Rich Message Types** - Text, photos, documents, inline keyboards
-- **Interactive Elements** - Callback queries, inline keyboards, commands
-- **File Handling** - Smart upload strategies based on file size
-- **Chat Actions** - Typing indicators and status updates
-
-### 🧠 Advanced Features  
-- **Finite State Machine** - Per-user conversation state management
-- **Session Storage** - Key-value storage for user data
-- **Pattern Matching** - Regex, exact match, and command routing
-- **Error Handling** - Structured error responses and recovery
-- **Graceful Shutdown** - Proper cleanup and resource management
+- **10 Core Endpoints** - Essential bot operations
+  - SendMessage, SendPhoto, SendDocument
+  - EditMessageText, DeleteMessage
+  - SendChatAction, AnswerCallbackQuery
+  - GetMe, GetChat, SetMyCommands
+- **Long Polling** - Automatic update fetching
+- **Callback Queries** - Interactive button handling
 
 ## 📦 Installation
 
@@ -75,10 +55,8 @@ import (
 )
 
 func main() {
-    // Create router
     r := router.New()
     
-    // Add handlers
     r.Command("/start", func(ctx core.Context) {
         ctx.Send(&commands.SendMessageRequest{
             Text: "👋 Hello! I'm a Gogram bot!",
@@ -91,7 +69,6 @@ func main() {
         })
     })
     
-    // Start bot
     bot := runtime.New(os.Getenv("TELEGRAM_TOKEN"), runtime.WithRouter(r))
     bot.Run(context.Background())
 }
@@ -106,9 +83,6 @@ func handleStart(ctx core.Context) {
             commands.Button("📊 Stats", "stats"),
             commands.Button("⚙️ Settings", "settings"),
         ).
-        Row(
-            commands.URLButton("🌐 Website", "https://example.com"),
-        ).
         Build()
 
     ctx.Send(&commands.SendMessageRequest{
@@ -118,17 +92,15 @@ func handleStart(ctx core.Context) {
 }
 
 func handleCallback(ctx core.Context) {
-    ctx.AnswerCallback(&commands.AnswerCallbackQueryRequest{
-        CallbackQueryID: ctx.CallbackData(),
-        Text:           "Processing...",
-    })
-    
-    // Handle different callbacks
     switch ctx.CallbackData() {
     case "stats":
-        showStats(ctx)
+        ctx.Send(&commands.SendMessageRequest{
+            Text: "📊 Here are your stats...",
+        })
     case "settings":
-        showSettings(ctx)
+        ctx.Send(&commands.SendMessageRequest{
+            Text: "⚙️ Settings menu...",
+        })
     }
 }
 ```
@@ -139,7 +111,6 @@ func handleCallback(ctx core.Context) {
 func registerFlow() core.Router {
     r := router.New()
     
-    // Start registration
     r.Command("/register", func(ctx core.Context) {
         ctx.Send(&commands.SendMessageRequest{
             Text: "What's your name?",
@@ -147,7 +118,6 @@ func registerFlow() core.Router {
         ctx.FMS().Set(ctx.ChatId(), "awaiting_name")
     })
     
-    // Handle name input
     nameGroup := r.Group("/name").SetState("awaiting_name")
     nameGroup.Any(func(ctx core.Context) {
         name := ctx.Text()
@@ -159,7 +129,6 @@ func registerFlow() core.Router {
         })
     })
     
-    // Handle age input
     ageGroup := r.Group("/age").SetState("awaiting_age")
     ageGroup.Any(func(ctx core.Context) {
         name := ctx.FMS().GetParam(ctx.ChatId(), "name")
@@ -168,7 +137,7 @@ func registerFlow() core.Router {
         ctx.Send(&commands.SendMessageRequest{
             Text: fmt.Sprintf("Great! %s, %s years old. Registration complete!", name, age),
         })
-        ctx.FMS().Set(ctx.ChatId(), "") // Clear state
+        ctx.FMS().Set(ctx.ChatId(), "")
     })
     
     return r
@@ -177,98 +146,55 @@ func registerFlow() core.Router {
 
 ## 🏗️ Architecture
 
-Gogram follows **Clean Architecture** principles with clear separation between layers:
+Simple layered architecture with interface-based design:
 
 ```mermaid
 graph TB
     subgraph "🌐 Presentation Layer"
-        A[Router & DSL]
+        A[Router & Handlers]
         B[Middleware Chain]
-        C[Context & Handlers]
+        C[Context]
     end
     
     subgraph "💼 Business Layer"
-        D[FSM & Session]
-        E[Logger & Telemetry]
-        F[State Machine & Workflow]
+        D[FSM & State]
+        E[Message Processing]
     end
     
     subgraph "🔧 Infrastructure Layer"
-        G[HTTP Client & API]
-        H[Poller & Updates]
-        I[Transport & Networking]
+        F[HTTP Client]
+        G[Long Polling]
+        H[Telegram API]
     end
     
     A --> D
     B --> E
-    C --> F
-    D --> G
-    E --> H
-    F --> I
+    C --> D
+    D --> F
+    E --> G
+    F --> H
     
     style A fill:#e1f5fe
     style B fill:#e1f5fe
     style C fill:#e1f5fe
     style D fill:#fff3e0
     style E fill:#fff3e0
-    style F fill:#fff3e0
+    style F fill:#f3e5f5
     style G fill:#f3e5f5
     style H fill:#f3e5f5
-    style I fill:#f3e5f5
 ```
-
-### 🏛️ Core Principles
-
-- **Dependency Inversion** - Abstractions don't depend on details
-- **Interface Segregation** - Small, focused interfaces  
-- **Single Responsibility** - Each layer has one clear purpose
-- **Open/Closed** - Extensible through interfaces, stable core
-- **Testability** - Mock any dependency for unit testing
-
-## 📚 Documentation
-
-### 🔧 Core Concepts
-
-- [**Context**](docs/context.md) - Request-scoped data and operations
-- [**Router & DSL**](docs/routing.md) - Advanced routing patterns  
-- [**Middleware**](docs/middleware.md) - Cross-cutting concerns
-- [**FSM**](docs/fsm.md) - State management for conversations
-- [**Error Handling**](docs/errors.md) - Robust error management
-
-### 📖 Guides
-
-- [**Getting Started**](docs/getting-started.md) - Step-by-step tutorial
-- [**Best Practices**](docs/best-practices.md) - Production recommendations
-- [**Testing Guide**](docs/testing.md) - How to test your bots
-- [**Deployment**](docs/deployment.md) - Production deployment strategies
-- [**Migration Guide**](docs/migration.md) - Migrating from other libraries
-
-### 🔌 API Reference
-
-- [**Commands**](docs/api/commands.md) - All available Telegram commands
-- [**Types**](docs/api/types.md) - Type definitions and structures
-- [**Interfaces**](docs/api/interfaces.md) - Core interface documentation
 
 ## 🧪 Examples
 
-Explore our comprehensive examples to learn different patterns:
+| Example | Description | 
+|---------|-------------|
+| [**Echo Bot**](examples/echo-bot/) | Simple message echoing |
+| [**Interactive Bot**](examples/interactive-bot/) | Keyboards and callbacks |
+| [**Register Flow**](examples/register-flow/) | User registration with FSM |
 
-| Example | Description | Complexity |
-|---------|-------------|------------|
-| [**Echo Bot**](examples/echo-bot/) | Simple message echoing | Beginner |
-| [**Register Flow**](examples/register-flow/) | User registration with FSM | Intermediate |
-| [**Interactive Bot**](examples/interactive-bot/) | Keyboards, callbacks, media | Intermediate |
-| [**Admin Panel**](examples/admin-panel/) | User management, permissions | Advanced |
-| [**E-commerce Bot**](examples/ecommerce/) | Shopping cart, payments | Advanced |
-| [**Survey Bot**](examples/survey/) | Dynamic forms, analytics | Advanced |
-
-### 🏃 Running Examples
+### Running Examples
 
 ```bash
-# Clone the repository
-git clone https://github.com/AlexMayka/gogram.git
-cd gogram
-
 # Set your bot token
 export TELEGRAM_TOKEN="your_bot_token_here"
 
@@ -280,8 +206,6 @@ go run ./examples/register-flow/
 
 ## 🧪 Testing
 
-Gogram includes a comprehensive test suite with **27 tests** covering all core functionality:
-
 ```bash
 # Run all tests
 go test ./...
@@ -292,135 +216,75 @@ go tool cover -html=coverage.out
 
 # Run specific package tests
 go test -v ./core/
-go test -v ./infra/router/
-go test -v ./runtime/
 ```
 
-### 🎯 Test Coverage
+### Test Coverage
+- **Core Package** - Router, Context, FSM functionality
+- **26 Test Functions** - Covering main use cases
+- **Mock Implementations** - For testing handlers
 
-- ✅ **Core Interfaces** - Router, Context, FSM, Logger
-- ✅ **Middleware Chain** - Execution order, error handling
-- ✅ **State Management** - FSM transitions, data persistence  
-- ✅ **Message Routing** - Commands, callbacks, patterns
-- ✅ **API Integration** - HTTP client, error handling
-- ✅ **Context Operations** - User data, chat information
+## 📚 API Reference
 
-## 🚀 Performance
+### Available Commands
+- `SendMessage` - Send text messages
+- `SendPhoto` - Send photos with captions
+- `SendDocument` - Send files
+- `EditMessageText` - Edit sent messages
+- `DeleteMessage` - Delete messages
+- `SendChatAction` - Show typing/uploading status
+- `AnswerCallbackQuery` - Respond to button clicks
+- `GetMe` - Get bot information
+- `GetChat` - Get chat details
+- `SetMyCommands` - Set bot command menu
 
-Gogram is built for high-performance production use:
+### Routing Options
+- `Command("/start", handler)` - Handle commands
+- `Callback("data", handler)` - Handle button clicks
+- `Regex("pattern", handler)` - Pattern matching
+- `Text("exact text", handler)` - Exact text match
+- `Any(handler)` - Catch-all handler
 
-| Metric | Value | Description |
-|--------|-------|-------------|
-| **Latency** | <1ms | Average handler execution time |
-| **Throughput** | 10k+ ops/sec | Messages processed per second |
-| **Memory** | ~2MB | Base memory footprint |
-| **Allocations** | Zero | Hot path allocations |
-| **Goroutines** | Minimal | Efficient concurrency model |
-
-### ⚡ Optimizations
-
-- **Zero-allocation routing** with pre-compiled patterns
-- **Context pooling** for reduced GC pressure  
-- **Connection reuse** for HTTP clients
-- **Efficient serialization** with json-iterator
-- **Smart batching** for bulk operations
+### State Management
+- `ctx.FMS().Set(chatId, state)` - Set user state
+- `ctx.FMS().Get(chatId)` - Get current state
+- `ctx.FMS().SetParam(chatId, key, value)` - Store data
+- `ctx.FMS().GetParam(chatId, key)` - Retrieve data
 
 ## 🔧 Configuration
 
-Gogram supports flexible configuration through environment variables and code:
-
 ```go
-// Environment Variables
-TELEGRAM_TOKEN=your_bot_token
-TELEGRAM_WEBHOOK_URL=https://yourdomain.com/webhook  
-TELEGRAM_LOG_LEVEL=info
-TELEGRAM_TIMEOUT=30s
+// Basic configuration
+bot := runtime.New(
+    os.Getenv("TELEGRAM_TOKEN"),
+    runtime.WithRouter(router),
+)
 
-// Programmatic Configuration
-config := runtime.Config{
-    Token:       os.Getenv("TELEGRAM_TOKEN"),
-    Timeout:     30 * time.Second,
-    LogLevel:    "info",
-    MaxRetries:  3,
-    WebhookURL:  "https://yourdomain.com/webhook",
-}
-
-bot := runtime.NewWithConfig(config, runtime.WithRouter(router))
-```
-
-## 🛡️ Security
-
-Security is a first-class citizen in Gogram:
-
-- ✅ **Input Validation** - All user inputs are validated
-- ✅ **SQL Injection Prevention** - Parameterized queries only
-- ✅ **XSS Protection** - HTML escaping for user content  
-- ✅ **Rate Limiting** - Built-in protection against spam
-- ✅ **Token Security** - Secure token handling and rotation
-- ✅ **HTTPS Only** - All API calls use encrypted connections
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-### 🎯 Areas for Contribution
-
-- 📝 **Documentation** - Improve guides and examples
-- 🧪 **Testing** - Add more test cases and scenarios  
-- 🔧 **Features** - Implement new Telegram Bot API features
-- 🐛 **Bug Fixes** - Help us squash bugs
-- 🎨 **Examples** - Create new example bots
-- 📊 **Performance** - Optimize critical paths
-
-### 👥 Development Setup
-
-```bash
-# Clone repository
-git clone https://github.com/AlexMayka/gogram.git
-cd gogram
-
-# Install dependencies
-go mod download
-
-# Run tests
-go test ./...
-
-# Run linting
-golangci-lint run
-
-# Build examples
-go build ./examples/...
+// Start with context
+ctx := context.Background()
+bot.Run(ctx)
 ```
 
 ## 📄 License
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## 🤝 Contributing
 
-Gogram is inspired by excellent frameworks and libraries:
+Contributions are welcome! Feel free to:
+- Report bugs
+- Suggest features
+- Submit pull requests
+- Improve documentation
 
-- [**Gin**](https://github.com/gin-gonic/gin) - HTTP web framework design patterns
-- [**aiogram**](https://github.com/aiogram/aiogram) - Python Telegram Bot framework  
-- [**grammY**](https://github.com/grammyjs/grammY) - TypeScript Telegram Bot framework
-- [**Chi**](https://github.com/go-chi/chi) - Router design and middleware patterns
+## 📞 Support
 
-## 📞 Support & Community
-
-- 📖 **Documentation**: [https://gogram.dev](https://gogram.dev)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/AlexMayka/gogram/discussions)  
 - 🐛 **Bug Reports**: [GitHub Issues](https://github.com/AlexMayka/gogram/issues)
-- 💬 **Telegram Chat**: [@gogram_dev](https://t.me/gogram_dev)
-- 🐦 **Twitter**: [@gogram_go](https://twitter.com/gogram_go)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/AlexMayka/gogram/discussions)
 
 ---
 
 <div align="center">
 
-**🌟 Star us on GitHub — it motivates us a lot!**
-
 Made with ❤️ by [Aleksey Mayka](https://github.com/AlexMayka)
-
-[⬆️ Back to Top](#-gogram)
 
 </div>
